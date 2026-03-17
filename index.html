@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Request Approval System</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f6fa;
+      text-align: center;
+      padding: 40px;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      margin: auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    select, input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #0078D4;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005ea6;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Submit Request</h2>
+
+<select id="segment">
+  <option value="RTO">RTO</option>
+  <option value="MF">MF</option>
+</select>
+
+<select id="category"></select>
+
+<input id="amount" placeholder="Enter amount (₹)">
+<input id="email" placeholder="Enter email">
+
+<button onclick="submitData()">Submit</button>
+
+<p id="status"></p>
+
+</div>
+
+<script>
+
+const categories = [
+  { name: "RTO Cat1", segment: "RTO" },
+  { name: "RTO Cat2", segment: "RTO" },
+  { name: "MF Cat1", segment: "MF" },
+  { name: "MF Cat2", segment: "MF" }
+];
+
+const segment = document.getElementById("segment");
+const category = document.getElementById("category");
+
+function loadCategories() {
+  category.innerHTML = "";
+  categories
+    .filter(c => c.segment === segment.value)
+    .forEach(c => {
+      let opt = document.createElement("option");
+      opt.value = c.name;
+      opt.text = c.name;
+      category.appendChild(opt);
+    });
+}
+
+segment.addEventListener("change", loadCategories);
+loadCategories();
+
+
+// ₹ FORMAT (auto comma)
+document.getElementById("amount").addEventListener("input", function(e) {
+  let value = e.target.value.replace(/,/g, "");
+  if (!isNaN(value) && value !== "") {
+    e.target.value = Number(value).toLocaleString("en-IN");
+  }
+});
+
+
+function submitData() {
+
+  const amountRaw = document.getElementById("amount").value.replace(/,/g, "");
+
+  fetch("https://power-app-demo-workflow-function-app-dqacakhfdja7gpcp.southindia-01.azurewebsites.net/api/submitRequest", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      segment: segment.value,
+      category: category.value,
+      amount: Number(amountRaw),
+      email: document.getElementById("email").value,
+      caseId: segment.value + "-" + category.value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("status").innerHTML =
+      "✅ Submitted! Request ID: " + data.requestId;
+  })
+  .catch(err => {
+    document.getElementById("status").innerHTML =
+      "❌ Error submitting request";
+  });
+
+}
+
+</script>
+
+</body>
+</html>
