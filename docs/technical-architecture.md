@@ -11,6 +11,7 @@ This system implements an event-driven approval workflow using Azure serverless 
 ### 1. Frontend (Azure Static Web App)
 
 **Technology:** HTML, CSS, JavaScript
+
 **Hosting:** Azure Static Web Apps
 
 **Responsibilities:**
