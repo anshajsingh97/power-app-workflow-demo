@@ -1,4 +1,4 @@
-# Request Approval System (Azure)
+# Request Approval System (Azure Serverless Workflow)
 
 ## Overview
 A cloud-based approval workflow system built using Azure services.
